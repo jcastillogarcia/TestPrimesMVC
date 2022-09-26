@@ -1,0 +1,98 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <div class="text-left">
+    <h4>Review if the input number is a circular prime number</h4>
+        <div class="form-group">
+            <label for="number">Number:</label>
+            <input type="number" min="1" max="1000000" id="txtNumber" class="form-control" name="number" oninput="validity.valid||(value='');" />
+        </div>
+        <button onclick="IsCircular()" class="btn btn-primary">Review</button>
+          <div class="form-group">
+            <label>Result:</label>            
+            <label id="lblResultIsCircular"></label>            
+        </div>         
+    </div>
+    
+    <div class="text-left">
+    <h4>Circular prime numbers below the input number</h4>
+        <div class="form-group">
+            <label for="numberToCalculate">Number:</label>
+            <input type="number" min="1" max="1000000" id="txtNumberToCalculate" class="form-control" name="numberToCalculate" oninput="validity.valid||(value='');" />
+        </div>
+        <button onclick="GetPrimeNumbers()"  class="btn btn-primary">Calculate</button>
+        <div class="form-group">
+            <label>Result:</label>            
+            <label id="lblResultPrimes" for="result"></label>            
+        </div>         
+    </div>
+
+</div>
+
+<script>
+
+
+    function GetPrimeNumbers()
+    {        
+        $("#lblResultPrimes").text('');
+        var number = $("#txtNumberToCalculate").val();
+
+       if(!Validate(number)){
+            $("#txtNumberToCalculate").val('');
+            return;
+       }
+       
+
+        $.getJSON("/Home/GetCircularPrimeNumbers?number=" + number ,function(primes){
+            if(primes.length==0)
+            {
+                $("#lblResultPrimes").text('There are not circular prime numbers below ' + number);
+            }
+            else
+            {  
+                var result='';
+                for ( var i = 0; i <= primes.length-1; i++ ) {
+                   result=result + primes[i] + ', '                   
+                }
+                $("#lblResultPrimes").text(result);
+            }
+        });
+    }
+
+     function IsCircular()
+    {
+        var number = $("#txtNumber").val();
+        if(!Validate(number)){
+                $("#txtNumber").val('');
+                return;
+            }
+
+        $.getJSON("/Home/IsCircular?number=" + number ,function(result){
+            if(result)
+                $("#lblResultIsCircular").text(number + ' is a circular prime number');
+            else 
+                $("#lblResultIsCircular").text(number + ' is not a circular prime number');
+            
+        });
+    }
+
+    function Validate(number)
+    {
+         if(number<0){
+            alert('Must be a positive number');
+            return false;
+            }
+
+            if(number>1000000){
+            alert('The number must be less that one million');
+            return false;
+            }
+
+            return true;
+    }
+
+</script>
